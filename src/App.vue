@@ -9,7 +9,8 @@ import Purpose from './components/Purpose.vue'
 </script>
 
 <template>
-  <HelloWorld msg="Welcome to Recipes" />
+  <!-- <HelloWorld msg="Welcome to Recipes" /> -->
+  <img src="./assets/louis-hansel-MlPD-AzZYMg-unsplash.jpg" alt="" srcset="">
   <Purpose />
   <Examples />
 </template>
@@ -20,15 +21,20 @@ import Purpose from './components/Purpose.vue'
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  color: #fdfffe;
+  /* margin-top: 60px; */
 }
 body {
-  background: rgb(112, 19, 112);
+  background: rgb(255, 255, 255);
   display: flex;
   flex-direction: column;
   padding: 0;
   margin: 0;
   height: 100vh;
+}
+img {
+  height: 200px;
+  object-fit: cover;
+  width:100%;
 }
 </style>
