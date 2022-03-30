@@ -3,5 +3,8 @@ import NavBarVue from '../components/NavBar.vue'
 </script>
 <template>
 <NavBarVue />
-<h3>This is the sign in page</h3>
+  <p>
+    <router-link class="decoration-none" to="/register">Register here</router-link> if you don't have an account
+  </p>
+
 </template>
