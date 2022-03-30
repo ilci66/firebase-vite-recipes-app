@@ -15,6 +15,9 @@
   text-align: center;
   /* margin-top: 60px; */
 }
+* {
+  box-sizing: border-box;
+}
 body {
   display: flex;
   flex-direction: column;

@@ -1,7 +1,12 @@
-<!-- <script setup lang="ts">
-</script> -->
+<script setup lang="ts">
+import NavBarVue from '../components/NavBar.vue';
+import ExamplesVue from '../components/Examples.vue';
+import PurposeVue from '../components/Purpose.vue';
+</script>
 <template>
-<h3 class="text-red">This is the home page</h3>
+<NavBarVue />
+<PurposeVue />
+<ExamplesVue />
 </template>
-<!-- <style>
-</style> -->
+<style>
+</style>
