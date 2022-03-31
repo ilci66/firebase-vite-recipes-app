@@ -23,7 +23,8 @@ body {
   flex-direction: column;
   padding: 0;
   margin: 0;
-  height: 100vh;
+  min-height: 100vh;
+  background-color: rgb(245, 255, 234);
 }
 img {
   height: 200px;
