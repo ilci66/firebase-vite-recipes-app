@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import NavBarVue from '../components/NavBar.vue'
 import { getAuth } from "firebase/auth";
+import CreateRecipeVue from '../components/CreateRecipe.vue'
 console.log()
 </script>
 <template>
 <NavBarVue />
-<h3>This is the profile page</h3>
+<CreateRecipeVue />
 </template>
 <!-- <style>
 </style> -->

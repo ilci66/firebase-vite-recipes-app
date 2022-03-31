@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Home from '../views/Home.vue'
-import Profile from '../views/Profile.vue';
+import MyRecipes from '../views/MyRecipes.vue';
 import Recipe from '../views/Recipe.vue';
 import SignIn from "../views/SignIn.vue";
 import Register from "../views/Register.vue";
@@ -10,13 +10,13 @@ const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/', name:'home' , component: Home },
-    { path: '/profile/:recipe',name:'recipe' , component: Recipe },
+    { path: '/my-recipes/:recipe',name:'recipe' , component: Recipe },
     { path: '/sign-in', name:'signIn', component: SignIn },
     { path: '/register', name:'register', component: Register },
     { 
-      path: '/profile', 
-      name: 'profile',
-      component: Profile, 
+      path: '/my-recipes', 
+      name: 'MyRecipes',
+      component: MyRecipes, 
       meta: {
         requiresAuth: true
       }

@@ -2,7 +2,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import 'uno.css'
 import router from './router/index.js'
-
+import { initializeApp } from "firebase/app";
 const {
   VITE_API_KEY, 
   VITE_AUTH_DOMAIN, 
@@ -12,7 +12,6 @@ const {
   VITE_APP_ID
 } = import.meta.env
 
-import { initializeApp } from "firebase/app";
 
 // very basic type, check it out later
 const firebaseConfig = {

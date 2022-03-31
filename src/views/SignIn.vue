@@ -4,7 +4,8 @@ import { ref } from 'vue';
 import { 
   getAuth, 
   signInWithEmailAndPassword,
-  GoogleAuthProvider
+  GoogleAuthProvider,
+  signInWithPopup,
 } from "firebase/auth";
 import { useRouter } from 'vue-router';
 const email = ref("");
@@ -38,7 +39,18 @@ const signIn = () => {
     })
 }
 
-
+const googleSignIn = () => {
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({
+    'login_hint': 'user@example.com'
+  });
+  signInWithPopup(getAuth(), provider)
+    .then((result) => {
+      console.log(result.user);
+      router.push("/")
+    })
+    .catch(console.log)
+};
 
 </script>
 <template>
@@ -58,7 +70,7 @@ const signIn = () => {
     <button class="p-2 bg-orange-300 text-white text-xl text-center w-9/10 border-none rounded-lg m-1 mt--8 cursor-pointer" @click="signIn">Submit</button>
   </p>
   <p>
-    <button class="p-2 text-lg text-white bg-red-700 text-center w-9/10 border-none rounded-lg m-1 cursor-pointer" @click="signIn">Sign in with Google</button>
+    <button class="p-2 text-lg text-white bg-red-700 text-center w-9/10 border-none rounded-lg m-1 cursor-pointer" @click="googleSignIn">Sign in with Google</button>
   </p>
 </div>
 </template>
