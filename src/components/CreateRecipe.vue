@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Auth, getAuth, onAuthStateChanged } from "@firebase/auth";
+import { getDatabase } from "@firebase/database";
 import { ref, reactive, onMounted, Ref } from 'vue';
 // import XMarkVue from './XMark.vue'
 const title = ref("");
@@ -10,6 +11,7 @@ const preparation = ref("");
 let auth: Auth;
 const userUid = ref("")
 onMounted(() => {
+  console.log("aasd",getDatabase())
   auth = getAuth();
   auth.onAuthStateChanged((user) => {
     if(user) {
