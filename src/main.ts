@@ -3,6 +3,9 @@ import App from './App.vue'
 import 'uno.css'
 import router from './router/index.js'
 import { initializeApp } from "firebase/app";
+import { getFirestore, collection, getDocs } from 'firebase/firestore/lite';
+// import "firebase/storage";
+
 const {
   VITE_API_KEY, 
   VITE_AUTH_DOMAIN, 
@@ -23,8 +26,8 @@ const firebaseConfig = {
   appId: VITE_APP_ID
 };
 
-initializeApp(firebaseConfig);
-
+const fBaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(fBaseApp); 
 
 const app = createApp(App);
 
