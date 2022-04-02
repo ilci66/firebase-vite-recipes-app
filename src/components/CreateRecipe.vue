@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { Auth, getAuth, onAuthStateChanged } from "@firebase/auth";
-import { getDatabase, connectDatabaseEmulator, ref as fRef, set } from "@firebase/database";
+import { getDatabase, connectDatabaseEmulator, ref as fRef, set, onChildAdded } from "@firebase/database";
 import { ref, reactive, onMounted, Ref } from 'vue';
+import * as _ from 'lodash';
 // import XMarkVue from './XMark.vue'
+const db = getDatabase();
 const title = ref("");
 const ingredient = ref("");
 const ingredients:Ref<string[]> = ref([]);
 const preparation = ref("");
+const allRecipes = ref([])
 
 let auth: Auth;
 const userUid = ref("")
@@ -14,7 +17,7 @@ onMounted(() => {
   
   // const db = getDatabase();
   // if(location.hostname === "localhost") {
-  //   connectDatabaseEmulator(db, "localhost", 9000);
+    //   connectDatabaseEmulator(db, "localhost", 9000);
   //   console.log("yeah on loclahost", db)
   // }
   
@@ -46,12 +49,27 @@ const removeIngredient = (e: { target: { id: string; }; }) => {
 
 const handleSubmitRecipe = () => {
   console.log(title, ingredients, preparation)
-  const db = getDatabase();
-  set(fRef(db, '/' + userUid.value), {
-    title, ingredients, preparation
+  set(fRef(db, '/' + userUid.value + "/" + title.value), {
+    title, ingredients, preparation 
   });
   console.log("sent")
 }
+const recipesRef = fRef(db, '/' + userUid.value);
+onChildAdded(recipesRef, (data) => {
+  // console.log("child added", data.val()["awesome cake"]["ingredients"]["_value"])
+  // console.log("recipes ==> ", data.val()["awesome cake"].ingredients)
+  let keys = Object.keys(data.val());
+  let updatedData = data.val();
+  console.log("the keys ==>", keys)
+  // allRecipes.value = _.map(data.val());
+  for (let i = 0; i < keys.length; i++){
+    
+    // console.log("using lodash ==>", _.map(keys[i]))
+    console.log("using lodash ==>", keys[i])
+    console.log("asdff", _.map(updatedData[keys[i]]))
+
+  }
+})
 </script>
 <template>
   <form  @submit.prevent="" class="flex flex-col w-19/20 bg-gray-100 m-auto p-5 mt-5 rounded-lg">
@@ -82,6 +100,11 @@ const handleSubmitRecipe = () => {
     </textarea>
     <input  @click="handleSubmitRecipe" class="cursor-pointer text-6 rounded-lg bg-blue-300 border-none p4 text-white w-40 m-auto mt-2" type="button" value="Submit">
   </form>
+  <div v-if="allRecipes">
+    <div v-for="r in allRecipes">
+      {{r}}
+    </div>
+  </div>
 </template>
 <style>
 </style>
