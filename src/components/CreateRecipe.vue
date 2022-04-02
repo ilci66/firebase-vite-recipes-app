@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Auth, getAuth, onAuthStateChanged } from "@firebase/auth";
-import { getDatabase } from "@firebase/database";
+import { getDatabase, connectDatabaseEmulator, ref as fRef, set } from "@firebase/database";
 import { ref, reactive, onMounted, Ref } from 'vue';
 // import XMarkVue from './XMark.vue'
 const title = ref("");
@@ -11,7 +11,14 @@ const preparation = ref("");
 let auth: Auth;
 const userUid = ref("")
 onMounted(() => {
-  console.log("aasd",getDatabase())
+  
+  // const db = getDatabase();
+  // if(location.hostname === "localhost") {
+  //   connectDatabaseEmulator(db, "localhost", 9000);
+  //   console.log("yeah on loclahost", db)
+  // }
+  
+
   auth = getAuth();
   auth.onAuthStateChanged((user) => {
     if(user) {
@@ -38,11 +45,16 @@ const removeIngredient = (e: { target: { id: string; }; }) => {
 }
 
 const handleSubmitRecipe = () => {
-  console.log("send it to the storage/database ")
+  console.log(title, ingredients, preparation)
+  const db = getDatabase();
+  set(fRef(db, '/' + userUid.value), {
+    title, ingredients, preparation
+  });
+  console.log("sent")
 }
 </script>
 <template>
-  <form  @submit.prevent="handleSubmitRecipe" class="flex flex-col w-19/20 bg-gray-100 m-auto p-5 mt-5 rounded-lg">
+  <form  @submit.prevent="" class="flex flex-col w-19/20 bg-gray-100 m-auto p-5 mt-5 rounded-lg">
     <label class="flex flex-col items-center" for="title-input">
       Title
       <input name="title-input" class="p-3 text-center w-9/10 border-none rounded-lg m-1 " type="text" v-model="title" placeholder="An awesome cake" >
@@ -54,21 +66,21 @@ const handleSubmitRecipe = () => {
     <button class="border-none text-4 text-white bg-teal p-2 rounded-lg cursor-pointer mt-2 w-40 m-auto" @click="addIngredient">
       Add Ingredient
     </button>
-      <div class="flex flex-row  flex-wrap">
-        <button 
-          @click.capture="removeIngredient" 
+      <div v-if="ingredients.length>0" class="flex flex-row  flex-wrap">
+        <div 
+          @click="removeIngredient" 
           :id="item"  
           :key="item"
           v-for="item in ingredients" 
-          class="animate-bounce cursor-pointer m-1 bg-red text-white-100 p-2 rounded-xl border-none text-5 item-center p--10"
+          class="cursor-pointer m-1 bg-red text-white-100 p-2 rounded-xl border-none text-5 item-center p--10"
         >
           {{item}}
-        </button>
+        </div>
       </div>
     <label class="mt-10 mb-1" for="how-to">How To Cook</label>
     <textarea name="how-to" class="m-auto  p-3 text-center h-50 w-9/10 border-none rounded-lg m-1 " type="text"  v-model="preparation">
     </textarea>
-    <input class="cursor-pointer text-6 rounded-lg bg-blue-300 border-none p4 text-white w-40 m-auto mt-2" type="button" value="Submit">
+    <input  @click="handleSubmitRecipe" class="cursor-pointer text-6 rounded-lg bg-blue-300 border-none p4 text-white w-40 m-auto mt-2" type="button" value="Submit">
   </form>
 </template>
 <style>
