@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { Auth, getAuth, onAuthStateChanged } from "@firebase/auth";
-import { getDatabase, connectDatabaseEmulator, ref as fRef, set, onChildAdded } from "@firebase/database";
+import { getDatabase, connectDatabaseEmulator, ref as fRef, set, onValue, onChildAdded, onChildChanged} from "@firebase/database";
 import { ref, reactive, onMounted, Ref } from 'vue';
 import * as _ from 'lodash';
+import { update } from "lodash";
+import router from "../router";
 // import XMarkVue from './XMark.vue'
 const db = getDatabase();
 const title = ref("");
 const ingredient = ref("");
 const ingredients:Ref<string[]> = ref([]);
 const preparation = ref("");
-const allRecipes = ref([])
+const allRecipes:Ref<{title: string, ingredients: [], preparation: string}[]> = ref([])
+const recipeCount = ref(0);
 
 let auth: Auth;
 const userUid = ref("")
@@ -32,6 +35,25 @@ onMounted(() => {
     }
   })
 })
+
+
+const userRecipesRef = fRef(db, '/'+ userUid.value);
+const getDataFromDatabase = () => {
+  onValue(userRecipesRef, (snapshot) => {
+    const data = snapshot.val();
+    console.log("data from db ==>", data[userUid.value])
+    let keys = Object.keys(data[userUid.value]);
+    let updatedData = data[userUid.value];
+    // console.log("updated data from db",updatedData)
+    for (let i = 0; i < keys.length; i++){
+      let title = updatedData[keys[i]]["title"]["_value"]
+      let ingredients =  updatedData[keys[i]]["ingredients"]["_value"]
+      let preparation = updatedData[keys[i]]["preparation"]["_value"] 
+      allRecipes.value = [...allRecipes.value, {title, ingredients,  preparation}]
+    }
+  })
+}
+
 const addIngredient = () => {
   if(ingredient.value==="") {
     alert("Can't add empty string")
@@ -41,6 +63,7 @@ const addIngredient = () => {
   console.log("ingredients", (ingredients.value))
   ingredient.value = ""
 }
+
 const removeIngredient = (e: { target: { id: string; }; }) => {
   console.log(e.target.id)
   ingredients.value.map(i => console.log(i===e.target.id))
@@ -53,23 +76,36 @@ const handleSubmitRecipe = () => {
     title, ingredients, preparation 
   });
   console.log("sent")
+  
 }
-const recipesRef = fRef(db, '/' + userUid.value);
-onChildAdded(recipesRef, (data) => {
-  // console.log("child added", data.val()["awesome cake"]["ingredients"]["_value"])
-  // console.log("recipes ==> ", data.val()["awesome cake"].ingredients)
-  let keys = Object.keys(data.val());
-  let updatedData = data.val();
-  console.log("the keys ==>", keys)
-  // allRecipes.value = _.map(data.val());
-  for (let i = 0; i < keys.length; i++){
-    
-    // console.log("using lodash ==>", _.map(keys[i]))
-    console.log("using lodash ==>", keys[i])
-    console.log("asdff", _.map(updatedData[keys[i]]))
 
-  }
+const removeRecipe = (t:string) => {
+  console.log("delete this one", t)
+  set(fRef(db, '/' + userUid.value + "/" + t), null)
+}
+
+const recipesRef = fRef(db, '/' + userUid.value);
+
+onChildAdded(recipesRef, (data) => {
+  getDataFromDatabase()
+// let keys = Object.keys(data.val());
+  // let updatedData = data.val();
+  // // console.log("updated data from db",updatedData)
+  // for (let i = 0; i < keys.length; i++){
+  //   let title = updatedData[keys[i]]["title"]["_value"]
+  //   let ingredients =  updatedData[keys[i]]["ingredients"]["_value"]
+  //   let preparation = updatedData[keys[i]]["preparation"]["_value"] 
+  //   allRecipes.value = [...allRecipes.value, {title, ingredients,  preparation}]
+  //   recipeCount.value += 1;
+  // }
+  // console.log("all recipes ==>", allRecipes.value)
 })
+onChildChanged(recipesRef, (data) => {
+  console.log("changed data ==>", data)
+  recipeCount.value = allRecipes.value.length;
+  getDataFromDatabase()
+})
+
 </script>
 <template>
   <form  @submit.prevent="" class="flex flex-col w-19/20 bg-gray-100 m-auto p-5 mt-5 rounded-lg">
@@ -100,9 +136,16 @@ onChildAdded(recipesRef, (data) => {
     </textarea>
     <input  @click="handleSubmitRecipe" class="cursor-pointer text-6 rounded-lg bg-blue-300 border-none p4 text-white w-40 m-auto mt-2" type="button" value="Submit">
   </form>
-  <div v-if="allRecipes">
-    <div v-for="r in allRecipes">
-      {{r}}
+  <div class="flex flex-wrap m-2 " v-if="allRecipes">
+    <div class="bg-blue-100 rounded-lg p-2 lg:w-2/5 sm:w-1/1 m-auto my-2 " v-for="r in allRecipes" :key="r.title" :id="r.title">
+      <h3>{{r.title}}</h3>
+      <div class="flex flex-row flex-wrap items-center">
+        <div class="bg-teal p-3 rounded-lg m-1 m-auto" v-for="i in  r.ingredients">{{i}}</div>
+      </div>
+      <div class="bg-pink m-1 text-white p-2 rounded-xl">
+        <p>{{r.preparation}}</p>
+      </div>
+      <button class="cursor-pointer bg-red-800 border-none p4 rounded-xl text-lg text-white" @click="removeRecipe(r.title)">Remove</button>
     </div>
   </div>
 </template>
